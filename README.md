@@ -1,6 +1,6 @@
 # This is my Portfolio
 
-Welcome to the portfolio of [Jesús M. Rueda-Becerril]().
+Welcome to the portfolio of [Dr. Jesús M. Rueda-Becerril](https://altjerue.github.io).
 
 ## DataCamp
 
@@ -17,8 +17,6 @@ In this project I analyse a dataset to investigate what factors may contribute t
 #### [What's in an Avocado Toast](./DataCamp/avocado_toast/avocado_toast_analysis.ipynb)
 
 In this project I perform a supply chain analysis of the main ingridients of the famous dish *Avocado toast*: avocado, olive oil and sourdough. I perform a deep data cleaning and exploratory data analysis (EDA) to find where these ingrediantes most commonly originate from.
-
-####
 
 ## Kaggle
 
