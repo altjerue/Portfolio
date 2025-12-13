@@ -24,6 +24,10 @@ I will be posting in [Kaggle](./Kaggle/) projects that I have completed in the [
 
 ## Other projects
 
+### Neural Networks
+
+I will be posting in [NeuralNetworks](./NeuralNetworks/) projects that are helping me solidify the concepts behind Neural Networks.
+
 ### Gists
 
 I have a [collection of GitHubGists](https://gist.github.com/altjerue) that you are welcome to check out!
