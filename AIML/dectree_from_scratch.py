@@ -126,7 +126,7 @@ def information_gain(y, left_y, right_y):
     return gain
 
 
-def find_best_split(X, y):
+def find_best_split(X, y, max_features=None):
     """
     Find the best feature and threshold to split on.
 
@@ -136,7 +136,8 @@ def find_best_split(X, y):
     Args:
         X: feature matrix (n_samples, n_features)
         y: labels (n_samples,)
-
+        max_features: number of random features to consider
+                    (None = all features)
     Returns:
         best_feature: index of best feature to split on
         best_threshold: threshold value for split
@@ -148,8 +149,22 @@ def find_best_split(X, y):
 
     n_features = X.shape[1]
 
+    # Select random subset of features
+    if max_features is None:
+        feature_indices = range(n_features)
+    elif max_features == "sqrt":
+        n_features_to_try = int(np.sqrt(n_features))
+        feature_indices = np.random.choice(
+            n_features, size=n_features_to_try, replace=False
+        )
+    else:
+        n_features_to_try = min(max_features, n_features)
+        feature_indices = np.random.choice(
+            n_features, size=n_features_to_try, replace=False
+        )
+
     # For each feature, try different thresholds
-    for feature_idx in range(n_features):
+    for feature_idx in feature_indices:
         # Get unique values of this feature as candidate thresholds
         # We'll try splitting at each unique value
         thresholds = np.unique(X[:, feature_idx])

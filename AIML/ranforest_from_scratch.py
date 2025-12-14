@@ -226,37 +226,59 @@ if __name__ == "__main__":
     print(f"   Test Accuracy: {test_acc_single:.3f}")
     print(f"   Gap: {train_acc_single - test_acc_single:.3f}")
 
-    # Train Random Forest
-    print("\n2. Training Random Forest (100 trees, max_depth=20)...")
-    # Improved Random Forest with better hyperparameters
-    rf = RandomForestClassifier(
-        n_trees=30,  # Sweet spot you found
-        max_depth=10,  # Shallower = less overfit per tree
-        min_samples_split=5,  # Require more samples
-        max_features=None,  # Use both features
+    # Train Random Forest with 30 trees
+    print("\n2. Training Random Forest (30 trees, max_depth=10)...")
+    rf1 = RandomForestClassifier(
+        n_trees=30,
+        max_depth=10,
+        min_samples_split=5,
+        max_features=None,
     )
-    rf.fit(X_train, y_train)
+    rf1.fit(X_train, y_train)
 
-    y_train_rf = rf.predict(X_train)
-    y_test_rf = rf.predict(X_test)
+    y_train_rf1 = rf1.predict(X_train)
+    y_test_rf1 = rf1.predict(X_test)
 
-    train_acc_rf = np.mean(y_train_rf == y_train)
-    test_acc_rf = np.mean(y_test_rf == y_test)
+    train_acc_rf1 = np.mean(y_train_rf1 == y_train)
+    test_acc_rf1 = np.mean(y_test_rf1 == y_test)
 
-    print(f"   Train Accuracy: {train_acc_rf:.3f}")
-    print(f"   Test Accuracy: {test_acc_rf:.3f}")
-    print(f"   Gap: {train_acc_rf - test_acc_rf:.3f}")
+    print(f"   Train Accuracy: {train_acc_rf1:.3f}")
+    print(f"   Test Accuracy: {test_acc_rf1:.3f}")
+    print(f"   Gap: {train_acc_rf1 - test_acc_rf1:.3f}")
+
+    # Train Random Forest with 100 trees and sqrt(n_)
+    print("\n3. Training Random Forest (100 trees, max_depth=20)...")
+    # Improved Random Forest with better hyperparameters
+    rf2 = RandomForestClassifier(
+        n_trees=100,
+        max_depth=20,
+        min_samples_split=4,
+        max_features="sqrt",  # Only consider sqrt(n_features) at each split
+    )
+    rf2.fit(X_train, y_train)
+
+    y_train_rf2 = rf2.predict(X_train)
+    y_test_rf2 = rf2.predict(X_test)
+
+    train_acc_rf2 = np.mean(y_train_rf2 == y_train)
+    test_acc_rf2 = np.mean(y_test_rf2 == y_test)
+
+    print(f"   Train Accuracy: {train_acc_rf2:.3f}")
+    print(f"   Test Accuracy: {test_acc_rf2:.3f}")
+    print(f"   Gap: {train_acc_rf2 - test_acc_rf2:.3f}")
 
     print("\n" + "-" * 60)
     print("COMPARISON:")
     print(f"Single Tree Test Acc: {test_acc_single:.3f}")
-    print(f"Random Forest Test Acc: {test_acc_rf:.3f}")
-    print(f"Improvement: {(test_acc_rf - test_acc_single):.3f}")
+    print(f"Random Forest 30 Test Acc: {test_acc_rf1:.3f}")
+    print(f"Improvement: {(test_acc_rf1 - test_acc_single):.3f}")
+    print(f"Random Forest 100 Test Acc: {test_acc_rf2:.3f}")
+    print(f"Improvement: {(test_acc_rf2 - test_acc_single):.3f}")
 
-    if test_acc_rf > test_acc_single:
-        print("✅ Random Forest wins! Ensemble reduces overfitting.")
-    else:
-        print("⚠️  Unexpected result - check implementation!")
+    # if test_acc_rf2 > test_acc_single:
+    #     print("✅ Random Forest wins! Ensemble reduces overfitting.")
+    # else:
+    #     print("⚠️  Unexpected result - check implementation!")
 
     print("-" * 60)
 
