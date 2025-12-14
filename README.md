@@ -4,9 +4,9 @@ Welcome my portfolio! Also feel welcome to visit my [personal webpage](https://a
 
 ## AI & ML
 
-### Neural Networks
+I will be posting in [AIML](./AIML/) projects that are helping me solidify the concepts behind AI and Machine Learning.
 
-I will be posting in [NeuralNetworks](./NeuralNetworks/) projects that are helping me solidify the concepts behind Neural Networks.
+- [Neural Network from scratch](./AIML/neuralnet_from_scratch.py): solved the XOR problem with a two-layer neural network, built from scratch.
 
 ### Other projects
 
