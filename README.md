@@ -8,6 +8,10 @@ I will be posting in [AIML](./AIML/) projects that are helping me solidify the c
 
 - [Neural Network from scratch](./AIML/neuralnet_from_scratch.py): solved the XOR problem with a two-layer neural network, built from scratch.
 
+- [Decision Tree from scratch](./AIML/dectree_from_scratch.py): implemented a decision tree to classify Iris flowers.
+
+- [Random Forest from scratch](./AIML/ranforest_from_scratch.py): implemented a random forest algorithm from scratch to classify Iris flowers, and compared accuracy with the results from a single Decision Tree.
+
 ### Other projects
 
 In the [DataCamp](./DataCamp/) directory, you will find some projects that I have worked on while sharpening my Data Science skills in [DataCamp learning platform](https://datacamp.com)

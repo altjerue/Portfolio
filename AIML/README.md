@@ -141,6 +141,43 @@ Accuracy Gap: 0.070
 
 ![](./dectree_accuracy.png)
 
-## Classifying Iris Flowers: Random Forest
+## Classifying Iris Flowers: Random Forest vs Decision Tree
 
-In [ranforest_from_scratch.py](./ranforest_from_scratch.py) I implemented a random forest from scratch.
+In [ranforest_from_scratch.py](./ranforest_from_scratch.py) I implemented a random forest from scratch using bootstrap resampling, a few number of random features for each tree, and majority voting.
+
+### Output
+
+```
+Loading Iris dataset...
+Training samples: 105
+Test samples: 45
+------------------------------------------------------------
+
+============================================================
+EXPERIMENT: Single Tree vs Random Forest
+============================================================
+
+1. Training single decision tree (max_depth=20)...
+   Train Accuracy: 0.962
+   Test Accuracy: 0.689
+   Gap: 0.273
+
+2. Training Random Forest (100 trees, max_depth=20)...
+Trained tree 1/30
+Trained tree 10/30
+Trained tree 20/30
+Trained tree 30/30
+   Train Accuracy: 0.914
+   Test Accuracy: 0.711
+   Gap: 0.203
+
+------------------------------------------------------------
+COMPARISON:
+Single Tree Test Acc: 0.689
+Random Forest Test Acc: 0.711
+Improvement: 0.022
+✅ Random Forest wins! Ensemble reduces overfitting.
+------------------------------------------------------------
+```
+
+![](./ranforest_accuracy.png)
