@@ -21,27 +21,6 @@ from sklearn.model_selection import train_test_split
 
 np.random.seed(42)
 
-# ============================================================
-# %% LOAD DATA
-# ============================================================
-print("Loading Iris dataset...")
-iris = load_iris()
-X = iris.data  # 4 features: sepal length/width, petal length/width
-y = iris.target  # 3 classes: setosa, versicolor, virginica
-
-# Use only first 2 features for easy visualization
-X = X[:, :2]
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42
-)
-
-print(f"Training samples: {len(X_train)}")
-print(f"Test samples: {len(X_test)}")
-print(f"Features: {iris.feature_names[:2]}")
-print(f"Classes: {iris.target_names}")
-print("-" * 60)
-
 
 # ============================================================
 # %% HELPER FUNCTIONS
@@ -71,6 +50,7 @@ def gini_impurity(y):
     if len(y) == 0:
         return 0
 
+    # Implement Gini impurity
     counts = np.bincount(y)
     proportions = counts / sum(counts)
     gini = 1 - sum(proportions**2)
@@ -98,6 +78,7 @@ def split_data(X, y, feature_idx, threshold):
         - Right: all flowers with sepal length > 5.5
     """
 
+    # Implement data splitting
     mask = X[:, feature_idx] <= threshold
 
     left_X = X[mask]
@@ -132,8 +113,8 @@ def information_gain(y, left_y, right_y):
     if n_left == 0 or n_right == 0:
         return 0  # No split happened
 
-    left_gini = gini_impurity(left_y)
-    right_gini = gini_impurity(right_y)
+    left_gini = gini_impurity(left_y)  # Gini of the left child
+    right_gini = gini_impurity(right_y)  # Gini of the right child
 
     # Weighted average of child Gini impurities
     weighted_child_gini = (n_left / n_total) * left_gini + (
@@ -167,20 +148,24 @@ def find_best_split(X, y):
 
     n_features = X.shape[1]
 
+    # For each feature, try different thresholds
     for feature_idx in range(n_features):
         # Get unique values of this feature as candidate thresholds
         # We'll try splitting at each unique value
         thresholds = np.unique(X[:, feature_idx])
 
         for threshold in thresholds:
+            # Splitting the data
             left_X, left_y, right_X, right_y = split_data(X, y, feature_idx, threshold)
 
             # Skip if split creates empty node
             if len(left_y) == 0 or len(right_y) == 0:
                 continue
 
+            # Calculate information gain
             gain = information_gain(y, left_y, right_y)
 
+            # Update best split if new gain is better
             if gain > best_gain:
                 best_gain = gain
                 best_feature = feature_idx
@@ -269,14 +254,17 @@ class DecisionTreeClassifier:
         n_samples = len(y)
         n_classes = len(np.unique(y))
 
+        # Stopping criteria
         if (
             depth >= self.max_depth
             or n_samples < self.min_samples_split
             or n_classes == 1
         ):
+            # Create and return leaf node
             leaf_value = np.bincount(y).argmax()
             return TreeNode(value=leaf_value)
 
+        # Find best split
         feature, threshold, gain = find_best_split(X, y)
 
         # If no gain OR no valid split found, make this a leaf
@@ -284,6 +272,7 @@ class DecisionTreeClassifier:
             leaf_value = np.bincount(y).argmax()
             return TreeNode(value=leaf_value)
 
+        # Split data and recursively build children
         left_X, left_y, right_X, right_y = split_data(X, y, feature, threshold)
 
         left_child = self._build_tree(left_X, left_y, depth + 1)
@@ -321,10 +310,11 @@ class DecisionTreeClassifier:
         if node.is_leaf():
             return node.value
 
+        # Implementing tree traversal
         if x[node.feature] <= node.threshold:
-            return self._traverse_tree(x, node.left)
+            return self._traverse_tree(x, node.left)  # traverse left child
         else:
-            return self._traverse_tree(x, node.right)
+            return self._traverse_tree(x, node.right)  # traverse right child
 
     def print_tree(self, node=None, depth=0):
         """
@@ -344,48 +334,14 @@ class DecisionTreeClassifier:
             self.print_tree(node.right, depth + 1)
 
 
-# ============================================================
-# %% TRAINING
-# ============================================================
-
-print("\nTraining decision tree...")
-tree = DecisionTreeClassifier(max_depth=5, min_samples_split=2)
-tree.fit(X_train, y_train)
-
-print("\nTree structure:")
-tree.print_tree()
-print("-" * 60)
-
-
-# ============================================================
-# %% EVALUATION
-# ============================================================
-
-y_train_pred = tree.predict(X_train)
-y_test_pred = tree.predict(X_test)
-
-train_accuracy = np.mean(y_train_pred == y_train)
-test_accuracy = np.mean(y_test_pred == y_test)
-
-print(f"\nTrain Accuracy: {train_accuracy:.3f}")
-print(f"Test Accuracy: {test_accuracy:.3f}")
-print(f"Accuracy Gap: {train_accuracy - test_accuracy:.3f}")
-
-if train_accuracy - test_accuracy > 0.1:
-    print("⚠️ Large gap suggests overfitting!")
-else:
-    print("✅ Good generalization!")
-
-print("-" * 60)
-
-
-# ============================================================
-# %% VISUALIZATION
-# ============================================================
-
-
 def plot_decision_boundary(model, X, y, title):
-    """Plot decision boundary for 2D data."""
+    """Plot decision boundary for 2D data.
+
+    Args:
+        model: trained model with a `predict` method
+        X, y: data arrays (2D features expected)
+        title: plot title
+    """
     h = 0.02
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
@@ -396,35 +352,104 @@ def plot_decision_boundary(model, X, y, title):
 
     plt.contourf(xx, yy, Z, alpha=0.3, cmap="viridis")
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", edgecolors="black", s=50)
-    plt.xlabel(iris.feature_names[0])
-    plt.ylabel(iris.feature_names[1])
+
+    try:
+        fname_x = plot_decision_boundary.feature_names[0]
+        fname_y = plot_decision_boundary.feature_names[1]
+    except Exception:
+        fname_x = "feature_0"
+        fname_y = "feature_1"
+
+    plt.xlabel(fname_x)
+    plt.ylabel(fname_y)
     plt.title(title)
 
 
-plt.figure(figsize=(15, 5))
+if __name__ == "__main__":
+    # ============================================================
+    # LOAD DATA
+    # ============================================================
+    print("Loading Iris dataset...")
+    iris = load_iris()
+    X = iris.data  # 4 features: sepal length/width, petal length/width
+    y = iris.target  # 3 classes: setosa, versicolor, virginica
 
-plt.subplot(1, 3, 1)
-plot_decision_boundary(
-    tree, X_train, y_train, f"Training Data\nAccuracy: {train_accuracy:.3f}"
-)
+    # Use only first 2 features for easy visualization
+    X = X[:, :2]  # NOTE: Use all features for better results
 
-plt.subplot(1, 3, 2)
-plot_decision_boundary(
-    tree, X_test, y_test, f"Test Data\nAccuracy: {test_accuracy:.3f}"
-)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.3, random_state=42
+    )
 
-plt.subplot(1, 3, 3)
-# Show overfitting by training a deep tree
-deep_tree = DecisionTreeClassifier(max_depth=20, min_samples_split=2)
-deep_tree.fit(X_train, y_train)
-y_test_deep = deep_tree.predict(X_test)
-test_acc_deep = np.mean(y_test_deep == y_test)
-plot_decision_boundary(
-    deep_tree,
-    X_test,
-    y_test,
-    f"Deep Tree (max_depth=20)\nTest Accuracy: {test_acc_deep:.3f}",
-)
+    print(f"Training samples: {len(X_train)}")
+    print(f"Test samples: {len(X_test)}")
+    print(f"Features: {iris.feature_names[:2]}")
+    print(f"Classes: {iris.target_names}")
+    print("-" * 60)
 
-plt.tight_layout()
-plt.show()
+    # ============================================================
+    # TRAINING
+    # ============================================================
+    print("\nTraining decision tree...")
+    tree = DecisionTreeClassifier(max_depth=5, min_samples_split=2)
+    tree.fit(X_train, y_train)
+
+    print("\nTree structure:")
+    tree.print_tree()
+    print("-" * 60)
+
+    # ============================================================
+    # EVALUATION
+    # ============================================================
+
+    y_train_pred = tree.predict(X_train)
+    y_test_pred = tree.predict(X_test)
+
+    train_accuracy = np.mean(y_train_pred == y_train)
+    test_accuracy = np.mean(y_test_pred == y_test)
+
+    print(f"\nTrain Accuracy: {train_accuracy:.3f}")
+    print(f"Test Accuracy: {test_accuracy:.3f}")
+    print(f"Accuracy Gap: {train_accuracy - test_accuracy:.3f}")
+
+    if train_accuracy - test_accuracy > 0.1:
+        print("⚠️ Large gap suggests overfitting!")
+    else:
+        print("✅ Good generalization!")
+
+    print("-" * 60)
+
+    # ============================================================
+    # VISUALIZATION
+    # ============================================================
+
+    # provide feature names to plotting helper
+    plot_decision_boundary.feature_names = iris.feature_names[:2]
+
+    plt.figure(figsize=(15, 5))
+
+    plt.subplot(1, 3, 1)
+    plot_decision_boundary(
+        tree, X_train, y_train, f"Training Data\nAccuracy: {train_accuracy:.3f}"
+    )
+
+    plt.subplot(1, 3, 2)
+    plot_decision_boundary(
+        tree, X_test, y_test, f"Test Data\nAccuracy: {test_accuracy:.3f}"
+    )
+
+    plt.subplot(1, 3, 3)
+    # Show overfitting by training a deep tree
+    deep_tree = DecisionTreeClassifier(max_depth=20, min_samples_split=2)
+    deep_tree.fit(X_train, y_train)
+    y_test_deep = deep_tree.predict(X_test)
+    test_acc_deep = np.mean(y_test_deep == y_test)
+    plot_decision_boundary(
+        deep_tree,
+        X_test,
+        y_test,
+        f"Deep Tree (max_depth=20)\nTest Accuracy: {test_acc_deep:.3f}",
+    )
+
+    plt.tight_layout()
+    plt.show()

@@ -19,56 +19,6 @@ import matplotlib.pyplot as plt
 # Set random seed for reproducibility
 np.random.seed(42)
 
-# ============================================================
-# %% DATA GENERATION - XOR Problem
-# ============================================================
-# XOR truth table:
-# Input: (0,0) -> Output: 0
-# Input: (0,1) -> Output: 1
-# Input: (1,0) -> Output: 1
-# Input: (1,1) -> Output: 0
-
-X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-
-y = np.array([[0], [1], [1], [0]])
-
-print("XOR Problem:")
-print("Inputs:\n", X)
-print("Targets:\n", y)
-print("\nThis is NOT linearly separable - you can't draw a line to separate them!")
-print("-" * 60)
-
-
-# ============================================================
-# %% NETWORK PARAMETERS
-# ============================================================
-input_size = 2  # 2 inputs (x1, x2)
-hidden_size = 4  # 4 hidden neurons
-output_size = 1  # 1 output (binary classification)
-learning_rate = 0.1
-epochs = 10000
-
-
-# ============================================================
-# %% WEIGHT INITIALIZATION
-# ============================================================
-# Shapes: W1 should be (hidden_size, input_size)
-#         b1 should be (hidden_size, 1)
-#         W2 should be (output_size, hidden_size)
-#         b2 should be (output_size, 1)
-
-W1 = 0.5 * np.random.randn(hidden_size, input_size)
-b1 = 0.5 * np.random.randn(hidden_size, 1)
-W2 = 0.5 * np.random.randn(output_size, hidden_size)
-b2 = 0.5 * np.random.randn(output_size, 1)
-
-print(f"\nInitialized weights:")
-print(f"W1 shape: {W1.shape if W1 is not None else 'Not implemented'}")
-print(f"b1 shape: {b1.shape if b1 is not None else 'Not implemented'}")
-print(f"W2 shape: {W2.shape if W2 is not None else 'Not implemented'}")
-print(f"b2 shape: {b2.shape if b2 is not None else 'Not implemented'}")
-print("-" * 60)
-
 
 # ============================================================
 # %% ACTIVATION FUNCTIONS
@@ -193,91 +143,129 @@ def update_weights(grads, learning_rate):
     b2 = b2 - learning_rate * grads["dLdb2"]
 
 
-# ============================================================
-# %% TRAINING LOOP
-# ============================================================
-print("\nStarting training...")
+if __name__ == "__main__":
 
-losses = []
+    # ===== XOR Problem =====
+    # XOR truth table:
+    # Input: (0,0) -> Output: 0
+    # Input: (0,1) -> Output: 1
+    # Input: (1,0) -> Output: 1
+    # Input: (1,1) -> Output: 0
 
-for epoch in range(epochs):
-    epoch_loss = 0
+    # DATA GENERATION
+    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    y = np.array([[0], [1], [1], [0]])
 
-    # Train on each sample
+    # NETWORK PARAMETERS
+    input_size = 2  # 2 inputs (x1, x2)
+    hidden_size = 4  # 4 hidden neurons
+    output_size = 1  # 1 output (binary classification)
+    learning_rate = 0.1
+    epochs = 10000
+
+    # WEIGHT INITIALIZATION
+    W1 = 0.5 * np.random.randn(hidden_size, input_size)
+    b1 = 0.5 * np.random.randn(hidden_size, 1)
+    W2 = 0.5 * np.random.randn(output_size, hidden_size)
+    b2 = 0.5 * np.random.randn(output_size, 1)
+
+    # Describe problem and show data
+    print("XOR Problem:")
+    print("Inputs:\n", X)
+    print("Targets:\n", y)
+    print("\nThis is NOT linearly separable - you can't draw a line to separate them!")
+    print("-" * 60)
+
+    print(f"\nInitialized weights:")
+    print(f"W1 shape: {W1.shape if W1 is not None else 'Not implemented'}")
+    print(f"b1 shape: {b1.shape if b1 is not None else 'Not implemented'}")
+    print(f"W2 shape: {W2.shape if W2 is not None else 'Not implemented'}")
+    print(f"b2 shape: {b2.shape if b2 is not None else 'Not implemented'}")
+    print("-" * 60)
+
+    # TRAINING
+    print("\nStarting training...")
+
+    losses = []
+
+    for epoch in range(epochs):
+        epoch_loss = 0
+
+        # Train on each sample
+        for i in range(len(X)):
+            x_sample = X[i]
+            y_true = y[i]
+
+            # 1. Call forward pass
+            y_pred, cache = forward(x_sample)
+
+            # 2. Compute loss
+            loss = compute_loss(y_true, y_pred)
+            epoch_loss += loss
+
+            # 3. Call backward pass
+            grads = backward(y_true, cache)
+
+            # 4. Update weights
+            update_weights(grads, learning_rate)
+
+        # Average loss over all samples
+        avg_loss = epoch_loss / len(X)
+        losses.append(avg_loss)
+
+        if epoch % 1000 == 0:
+            print(f"Epoch {epoch}, Loss: {avg_loss:.6f}")
+
+    print("\nTraining complete!")
+    print("-" * 60)
+
+    # TESTING
+    print("\nTesting on XOR inputs:")
     for i in range(len(X)):
-        x_sample = X[i]
+        x_test = X[i]
         y_true = y[i]
+        y_pred, _ = forward(x_test)
+        print(f"Input: {x_test}, True: {y_true[0]}, Predicted: {y_pred[0][0]:.4f}")
 
-        # 1. Call forward pass
-        y_pred, cache = forward(x_sample)
+    # VISUALIZATION
+    plt.figure(figsize=(12, 4))
 
-        # 2. Compute loss
-        loss = compute_loss(y_true, y_pred)
-        epoch_loss += loss
+    # Plot 1: Loss curve
+    plt.subplot(1, 2, 1)
+    plt.plot(losses)
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Training Loss Over Time")
+    plt.grid(True)
 
-        # 3. Call backward pass
-        grads = backward(y_true, cache)
+    # Plot 2: Decision boundary
+    plt.subplot(1, 2, 2)
+    h = 0.01
+    x_min, x_max = -0.5, 1.5
+    y_min, y_max = -0.5, 1.5
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
 
-        # 4. Update weights
-        update_weights(grads, learning_rate)
+    # Predict for each point in the mesh
+    Z = np.array(
+        [forward(np.array([x, y]))[0][0][0] for x, y in zip(xx.ravel(), yy.ravel())]
+    )
+    Z = Z.reshape(xx.shape)
 
-    # Average loss over all samples
-    avg_loss = epoch_loss / len(X)
-    losses.append(avg_loss)
+    plt.contourf(xx, yy, Z, alpha=0.8, cmap="RdYlBu")
+    plt.scatter(
+        X[:, 0],
+        X[:, 1],
+        c=y.ravel(),
+        s=200,
+        edgecolors="black",
+        linewidth=2,
+        cmap="RdYlBu",
+    )
+    plt.xlabel("x1")
+    plt.ylabel("x2")
+    plt.title("Decision Boundary (Red=0, Blue=1)")
+    plt.xlim(x_min, x_max)
+    plt.ylim(y_min, y_max)
 
-    if epoch % 1000 == 0:
-        print(f"Epoch {epoch}, Loss: {avg_loss:.6f}")
-
-print("\nTraining complete!")
-print("-" * 60)
-
-
-# ============================================================
-# TESTING
-# ============================================================
-print("\nTesting on XOR inputs:")
-for i in range(len(X)):
-    x_test = X[i]
-    y_true = y[i]
-    y_pred, _ = forward(x_test)
-    print(f"Input: {x_test}, True: {y_true[0]}, Predicted: {y_pred[0][0]:.4f}")
-
-
-# ============================================================
-# VISUALIZATION
-# ============================================================
-plt.figure(figsize=(12, 4))
-
-# Plot 1: Loss curve
-plt.subplot(1, 2, 1)
-plt.plot(losses)
-plt.xlabel("Epoch")
-plt.ylabel("Loss")
-plt.title("Training Loss Over Time")
-plt.grid(True)
-
-# Plot 2: Decision boundary
-plt.subplot(1, 2, 2)
-h = 0.01
-x_min, x_max = -0.5, 1.5
-y_min, y_max = -0.5, 1.5
-xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-
-# Predict for each point in the mesh
-Z = np.array(
-    [forward(np.array([x, y]))[0][0][0] for x, y in zip(xx.ravel(), yy.ravel())]
-)
-Z = Z.reshape(xx.shape)
-
-plt.contourf(xx, yy, Z, alpha=0.8, cmap="RdYlBu")
-plt.scatter(
-    X[:, 0], X[:, 1], c=y.ravel(), s=200, edgecolors="black", linewidth=2, cmap="RdYlBu"
-)
-plt.xlabel("x1")
-plt.ylabel("x2")
-plt.title("Decision Boundary (Red=0, Blue=1)")
-plt.xlim(x_min, x_max)
-plt.ylim(y_min, y_max)
-
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()

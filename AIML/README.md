@@ -1,4 +1,4 @@
-# Neural Networks
+# AI and ML
 
 ## Solving the XOR problem
 
@@ -53,7 +53,7 @@ Input: [1 1], True: 0, Predicted: 0.0000
 
 ![](./loss_and_decision_boundary.png)
 
-## Classifying iris flowers
+## Classifying Iris Flowers: Decision Tree
 
 In [dectree_from_scratch.py](./dectree_from_scratch.py) I implemented Decision Tree algorithm from scratch to classify species of Iris flowers, using the (classic) Iris dataset. I use *Gini impurity* to estimate the nodes purity (information gain).
 
@@ -140,3 +140,7 @@ Accuracy Gap: 0.070
 ```
 
 ![](./dectree_accuracy.png)
+
+## Classifying Iris Flowers: Random Forest
+
+In [ranforest_from_scratch.py](./ranforest_from_scratch.py) I implemented a random forest from scratch.
