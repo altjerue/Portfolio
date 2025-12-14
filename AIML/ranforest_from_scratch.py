@@ -296,7 +296,7 @@ if __name__ == "__main__":
 
     plt.subplot(1, 3, 2)
     plot_decision_boundary(
-        rf, X_test, y_test, f"Random Forest (100 trees)\nTest Acc: {test_acc_rf:.3f}"
+        rf2, X_test, y_test, f"Random Forest (100 trees)\nTest Acc: {test_acc_rf2:.3f}"
     )
 
     plt.subplot(1, 3, 3)
@@ -305,7 +305,9 @@ if __name__ == "__main__":
     test_accs = []
 
     for n in n_trees_list:
-        rf_temp = RandomForestClassifier(n_trees=n, max_depth=20, max_features="sqrt")
+        rf_temp = RandomForestClassifier(
+            n_trees=n, max_depth=20, min_samples_split=4, max_features="sqrt"
+        )
         rf_temp.fit(X_train, y_train)
         acc = np.mean(rf_temp.predict(X_test) == y_test)
         test_accs.append(acc)
