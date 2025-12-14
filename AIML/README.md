@@ -162,7 +162,7 @@ EXPERIMENT: Single Tree vs Random Forest
    Test Accuracy: 0.689
    Gap: 0.273
 
-2. Training Random Forest (100 trees, max_depth=20)...
+2. Training Random Forest (30 trees, max_depth=10)...
 Trained tree 1/30
 Trained tree 10/30
 Trained tree 20/30
@@ -171,12 +171,29 @@ Trained tree 30/30
    Test Accuracy: 0.711
    Gap: 0.203
 
+3. Training Random Forest (100 trees, max_depth=20)...
+Trained tree 1/100
+Trained tree 10/100
+Trained tree 20/100
+Trained tree 30/100
+Trained tree 40/100
+Trained tree 50/100
+Trained tree 60/100
+Trained tree 70/100
+Trained tree 80/100
+Trained tree 90/100
+Trained tree 100/100
+   Train Accuracy: 0.943
+   Test Accuracy: 0.756
+   Gap: 0.187
+
 ------------------------------------------------------------
 COMPARISON:
 Single Tree Test Acc: 0.689
-Random Forest Test Acc: 0.711
+Random Forest 30 Test Acc: 0.711
 Improvement: 0.022
-✅ Random Forest wins! Ensemble reduces overfitting.
+Random Forest 100 Test Acc: 0.756
+Improvement: 0.067
 ------------------------------------------------------------
 ```
 
