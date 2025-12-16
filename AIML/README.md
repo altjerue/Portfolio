@@ -218,18 +218,18 @@ TRAINING GRADIENT BOOSTING
 ============================================================
 
 Training Gradient Boosting with 100 rounds...
-  Round 1/100, Train Acc: 0.838
-  Round 20/100, Train Acc: 0.867
-  Round 40/100, Train Acc: 0.886
-  Round 60/100, Train Acc: 0.895
-  Round 80/100, Train Acc: 0.905
-  Round 100/100, Train Acc: 0.905
+  Round 1/100, Train Acc: 1.000
+  Round 20/100, Train Acc: 1.000
+  Round 40/100, Train Acc: 1.000
+  Round 60/100, Train Acc: 1.000
+  Round 80/100, Train Acc: 1.000
+  Round 100/100, Train Acc: 1.000
 
 ------------------------------------------------------------
 RESULTS:
-Train Accuracy: 0.905
-Test Accuracy: 0.689
-Gap: 0.216
+Train Accuracy: 1.000
+Test Accuracy: 0.956
+Gap: 0.044
 ------------------------------------------------------------
 
 ============================================================
@@ -237,9 +237,9 @@ COMPARISON: Single Tree vs RF vs Gradient Boosting
 ============================================================
 
 1. Training single decision tree (max_depth=20)...
-   Train Accuracy: 0.962
-   Test Accuracy: 0.689
-   Gap: 0.273
+   Train Accuracy: 1.000
+   Test Accuracy: 0.956
+   Gap: 0.044
 
 2. Training Random Forest
 Trained tree 1/100
@@ -253,25 +253,27 @@ Trained tree 70/100
 Trained tree 80/100
 Trained tree 90/100
 Trained tree 100/100
-   Train Accuracy: 0.943
-   Test Accuracy: 0.756
-   Gap: 0.187
+   Train Accuracy: 1.000
+   Test Accuracy: 1.000
+   Gap: 0.000
 
 3. Training Gradient Boosting
 
 Training Gradient Boosting with 100 rounds...
-  Round 1/100, Train Acc: 0.838
-  Round 20/100, Train Acc: 0.867
-  Round 40/100, Train Acc: 0.886
-  Round 60/100, Train Acc: 0.895
-  Round 80/100, Train Acc: 0.905
-  Round 100/100, Train Acc: 0.905
-   Train Accuracy: 0.905
-   Test Accuracy: 0.689
-   Gap: 0.216
+  Round 1/100, Train Acc: 0.971
+  Round 20/100, Train Acc: 0.981
+  Round 40/100, Train Acc: 0.990
+  Round 60/100, Train Acc: 1.000
+  Round 80/100, Train Acc: 1.000
+  Round 100/100, Train Acc: 1.000
+   Train Accuracy: 1.000
+   Test Accuracy: 1.000
+   Gap: 0.000
 
 Typical results on Iris (2 features):
-Single Tree (depth=20):    0.69 test accuracy
-Random Forest (100 trees): 0.76 test accuracy
-Gradient Boosting:         0.90 test accuracy
+Single Tree (depth=20):    0.96 test accuracy
+Random Forest (100 trees): 1.00 test accuracy
+Gradient Boosting:         1.00 test accuracy
 ```
+
+![](./gradboost_acc.png)

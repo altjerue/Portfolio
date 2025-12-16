@@ -427,14 +427,9 @@ class DecisionTreeRegressor:
             TreeNode (internal node or leaf)
         """
         n_samples = len(y)
-        n_classes = len(np.unique(y))
 
         # Stopping criteria
-        if (
-            depth >= self.max_depth
-            or n_samples < self.min_samples_split
-            or n_classes == 1
-        ):
+        if depth >= self.max_depth or n_samples < self.min_samples_split:
             # Create and return leaf node
             leaf_value = np.mean(y)
             return TreeNode(value=leaf_value)

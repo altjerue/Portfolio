@@ -205,7 +205,7 @@ if __name__ == "__main__":
     # ============================================================
     print("Loading Iris dataset...")
     iris = load_iris()
-    X = iris.data[:, :2]  # 2 features for visualization
+    X = iris.data  # 2 features for visualization
     y = iris.target
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -224,7 +224,7 @@ if __name__ == "__main__":
     print("TRAINING GRADIENT BOOSTING")
     print("=" * 60)
 
-    gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
+    gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=5)
 
     gb.fit(X_train, y_train)
 
@@ -309,11 +309,19 @@ if __name__ == "__main__":
     # ============================================================
     print("\nGenerating visualizations...")
 
+    X_train_2d = X_train[:, :2]  # Just for visualization
+    X_test_2d = X_test[:, :2]
+
+    gb_viz = GradientBoostingClassifier(
+        n_estimators=100, learning_rate=0.1, max_depth=5
+    )
+    gb_viz.fit(X_train_2d, y_train)
+
     plt.figure(figsize=(15, 5))
 
     plt.subplot(1, 3, 1)
     plot_decision_boundary(
-        gb,
+        gb_viz,
         X_train,
         y_train,
         f"Training Data\nAcc: {train_acc:.3f}",
@@ -322,7 +330,7 @@ if __name__ == "__main__":
 
     plt.subplot(1, 3, 2)
     plot_decision_boundary(
-        gb,
+        gb_viz,
         X_test,
         y_test,
         f"Test Data\nAcc: {test_acc:.3f}",

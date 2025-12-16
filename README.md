@@ -12,6 +12,8 @@ I will be posting in [AIML](./AIML/) projects that are helping me solidify the c
 
 - [Random Forest from scratch](./AIML/ranforest_from_scratch.py): implemented a random forest algorithm from scratch to classify Iris flowers, and compared accuracy with the results from a single Decision Tree.
 
+- [Gradient Boosting from scratch](./AIML/gradboost_from_scratch.py): implemented a gradient boosting algorithm from scratch to classify Iris flowers, and compared the accuracy with the results from a single Decision Tree and Random Forest.
+
 ### Other projects
 
 In the [DataCamp](./DataCamp/) directory, you will find some projects that I have worked on while sharpening my Data Science skills in [DataCamp learning platform](https://datacamp.com)
