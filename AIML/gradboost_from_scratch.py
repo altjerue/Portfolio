@@ -18,24 +18,7 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from dectree_from_scratch import DecisionTreeClassifier, DecisionTreeRegressor
 from ranforest_from_scratch import RandomForestClassifier
-
-# ============================================================
-# %% LOAD DATA
-# ============================================================
-print("Loading Iris dataset...")
-iris = load_iris()
-X = iris.data[:, :2]  # 2 features for visualization
-y = iris.target
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42
-)
-
-print(f"Training samples: {len(X_train)}")
-print(f"Test samples: {len(X_test)}")
-print(f"Classes: {iris.target_names}")
-print("-" * 60)
-
+from plot_helper import plot_decision_boundary
 
 # ============================================================
 # %% GRADIENT BOOSTING CLASSIFIER
@@ -216,145 +199,154 @@ class GradientBoostingClassifier:
         return np.argmax(probs, axis=1)
 
 
-# ============================================================
-# %% TRAINING
-# ============================================================
+if __name__ == "__main__":
+    # ============================================================
+    # LOAD DATA
+    # ============================================================
+    print("Loading Iris dataset...")
+    iris = load_iris()
+    X = iris.data[:, :2]  # 2 features for visualization
+    y = iris.target
 
-print("\n" + "=" * 60)
-print("TRAINING GRADIENT BOOSTING")
-print("=" * 60)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.3, random_state=42
+    )
 
-gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
+    print(f"Training samples: {len(X_train)}")
+    print(f"Test samples: {len(X_test)}")
+    print(f"Classes: {iris.target_names}")
+    print("-" * 60)
 
-gb.fit(X_train, y_train)
+    # ============================================================
+    # TRAINING
+    # ============================================================
+    print("\n" + "=" * 60)
+    print("TRAINING GRADIENT BOOSTING")
+    print("=" * 60)
 
-# Evaluate
-y_train_pred = gb.predict(X_train)
-y_test_pred = gb.predict(X_test)
+    gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
 
-train_acc = np.mean(y_train_pred == y_train)
-test_acc = np.mean(y_test_pred == y_test)
+    gb.fit(X_train, y_train)
 
-print("\n" + "-" * 60)
-print("RESULTS:")
-print(f"Train Accuracy: {train_acc:.3f}")
-print(f"Test Accuracy: {test_acc:.3f}")
-print(f"Gap: {train_acc - test_acc:.3f}")
-print("-" * 60)
+    # Evaluate
+    y_train_pred = gb.predict(X_train)
+    y_test_pred = gb.predict(X_test)
 
+    train_acc = np.mean(y_train_pred == y_train)
+    test_acc = np.mean(y_test_pred == y_test)
 
-# ============================================================
-# %% COMPARISON: Single Tree vs RF vs Gradient Boosting
-# ============================================================
+    print("\n" + "-" * 60)
+    print("RESULTS:")
+    print(f"Train Accuracy: {train_acc:.3f}")
+    print(f"Test Accuracy: {test_acc:.3f}")
+    print(f"Gap: {train_acc - test_acc:.3f}")
+    print("-" * 60)
 
-print("\n" + "=" * 60)
-print("COMPARISON: Single Tree vs RF vs Gradient Boosting")
-print("=" * 60)
+    # ============================================================
+    # COMPARISON: Single Tree vs RF vs Gradient Boosting
+    # ============================================================
+    print("\n" + "=" * 60)
+    print("COMPARISON: Single Tree vs RF vs Gradient Boosting")
+    print("=" * 60)
 
-# Train single decision tree (your baseline)
-print("\n1. Training single decision tree (max_depth=20)...")
-single_tree = DecisionTreeClassifier(max_depth=20)
-single_tree.fit(X_train, y_train)
+    # Train single decision tree (your baseline)
+    print("\n1. Training single decision tree (max_depth=20)...")
+    single_tree = DecisionTreeClassifier(max_depth=20)
+    single_tree.fit(X_train, y_train)
 
-y_train_single = single_tree.predict(X_train)
-y_test_single = single_tree.predict(X_test)
+    y_train_single = single_tree.predict(X_train)
+    y_test_single = single_tree.predict(X_test)
 
-train_acc_single = np.mean(y_train_single == y_train)
-test_acc_single = np.mean(y_test_single == y_test)
+    train_acc_single = np.mean(y_train_single == y_train)
+    test_acc_single = np.mean(y_test_single == y_test)
 
-print(f"   Train Accuracy: {train_acc_single:.3f}")
-print(f"   Test Accuracy: {test_acc_single:.3f}")
-print(f"   Gap: {train_acc_single - test_acc_single:.3f}")
+    print(f"   Train Accuracy: {train_acc_single:.3f}")
+    print(f"   Test Accuracy: {test_acc_single:.3f}")
+    print(f"   Gap: {train_acc_single - test_acc_single:.3f}")
 
-# Train Random Forest with 100 trees and sqrt(n_)
-print("\n2. Training Random Forest")
-rf = RandomForestClassifier(
-    n_trees=100,
-    max_depth=20,
-    min_samples_split=4,
-    max_features="sqrt",
-)
-rf.fit(X_train, y_train)
+    # Train Random Forest with 100 trees and sqrt(n_)
+    print("\n2. Training Random Forest")
+    rf = RandomForestClassifier(
+        n_trees=100,
+        max_depth=20,
+        min_samples_split=4,
+        max_features="sqrt",
+    )
+    rf.fit(X_train, y_train)
 
-y_train_rf = rf.predict(X_train)
-y_test_rf = rf.predict(X_test)
+    y_train_rf = rf.predict(X_train)
+    y_test_rf = rf.predict(X_test)
 
-train_acc_rf = np.mean(y_train_rf == y_train)
-test_acc_rf = np.mean(y_test_rf == y_test)
+    train_acc_rf = np.mean(y_train_rf == y_train)
+    test_acc_rf = np.mean(y_test_rf == y_test)
 
-print(f"   Train Accuracy: {train_acc_rf:.3f}")
-print(f"   Test Accuracy: {test_acc_rf:.3f}")
-print(f"   Gap: {train_acc_rf - test_acc_rf:.3f}")
+    print(f"   Train Accuracy: {train_acc_rf:.3f}")
+    print(f"   Test Accuracy: {test_acc_rf:.3f}")
+    print(f"   Gap: {train_acc_rf - test_acc_rf:.3f}")
 
-# Train Gradient Boosting with 100 trees
-print("\n3. Training Gradient Boosting")
-gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
-gbc.fit(X_train, y_train)
+    # Train Gradient Boosting with 100 trees
+    print("\n3. Training Gradient Boosting")
+    gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
+    gbc.fit(X_train, y_train)
 
-y_train_gbc = gbc.predict(X_train)
-y_test_gbc = gbc.predict(X_test)
+    y_train_gbc = gbc.predict(X_train)
+    y_test_gbc = gbc.predict(X_test)
 
-train_acc_gbc = np.mean(y_train_gbc == y_train)
-test_acc_gbc = np.mean(y_test_gbc == y_test)
+    train_acc_gbc = np.mean(y_train_gbc == y_train)
+    test_acc_gbc = np.mean(y_test_gbc == y_test)
 
-print(f"   Train Accuracy: {train_acc_gbc:.3f}")
-print(f"   Test Accuracy: {test_acc_gbc:.3f}")
-print(f"   Gap: {train_acc_gbc - test_acc_gbc:.3f}")
+    print(f"   Train Accuracy: {train_acc_gbc:.3f}")
+    print(f"   Test Accuracy: {test_acc_gbc:.3f}")
+    print(f"   Gap: {train_acc_gbc - test_acc_gbc:.3f}")
 
-print("\nTypical results on Iris (2 features):")
-print(f"Single Tree (depth=20):    {test_acc_single:.2f} test accuracy")
-print(f"Random Forest (100 trees): {test_acc_rf:.2f} test accuracy")
-print(f"Gradient Boosting:         {train_acc_gbc:.2f} test accuracy")
+    print("\nTypical results on Iris (2 features):")
+    print(f"Single Tree (depth=20):    {test_acc_single:.2f} test accuracy")
+    print(f"Random Forest (100 trees): {test_acc_rf:.2f} test accuracy")
+    print(f"Gradient Boosting:         {train_acc_gbc:.2f} test accuracy")
 
+    # ============================================================
+    # VISUALIZATION
+    # ============================================================
+    print("\nGenerating visualizations...")
 
-# ============================================================
-# %% VISUALIZATION
-# ============================================================
+    plt.figure(figsize=(15, 5))
 
+    plt.subplot(1, 3, 1)
+    plot_decision_boundary(
+        gb,
+        X_train,
+        y_train,
+        f"Training Data\nAcc: {train_acc:.3f}",
+        feature_names=iris.feature_names[:2],
+    )
 
-def plot_decision_boundary(model, X, y, title):
-    """Plot decision boundary for 2D data."""
-    h = 0.02
-    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+    plt.subplot(1, 3, 2)
+    plot_decision_boundary(
+        gb,
+        X_test,
+        y_test,
+        f"Test Data\nAcc: {test_acc:.3f}",
+        feature_names=iris.feature_names[:2],
+    )
 
-    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
+    plt.subplot(1, 3, 3)
+    # Show how accuracy improves with boosting rounds
+    n_rounds = [1, 5, 10, 20, 50, 100]
+    test_accs = []
 
-    plt.contourf(xx, yy, Z, alpha=0.3, cmap="viridis")
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", edgecolors="black", s=50)
-    plt.xlabel(iris.feature_names[0])
-    plt.ylabel(iris.feature_names[1])
-    plt.title(title)
+    for n in n_rounds:
+        gb_temp = GradientBoostingClassifier(
+            n_estimators=n, learning_rate=0.1, max_depth=3
+        )
+        gb_temp.fit(X_train, y_train)
+        acc = np.mean(gb_temp.predict(X_test) == y_test)
+        test_accs.append(acc)
 
+    plt.plot(n_rounds, test_accs, "o-", linewidth=2, markersize=8, color="green")
+    plt.xlabel("Number of Boosting Rounds")
+    plt.ylabel("Test Accuracy")
+    plt.title("Accuracy vs Boosting Rounds")
+    plt.grid(True)
 
-print("\nGenerating visualizations...")
-
-plt.figure(figsize=(15, 5))
-
-plt.subplot(1, 3, 1)
-plot_decision_boundary(gb, X_train, y_train, f"Training Data\nAcc: {train_acc:.3f}")
-
-plt.subplot(1, 3, 2)
-plot_decision_boundary(gb, X_test, y_test, f"Test Data\nAcc: {test_acc:.3f}")
-
-plt.subplot(1, 3, 3)
-# Show how accuracy improves with boosting rounds
-n_rounds = [1, 5, 10, 20, 50, 100]
-test_accs = []
-
-for n in n_rounds:
-    gb_temp = GradientBoostingClassifier(n_estimators=n, learning_rate=0.1, max_depth=3)
-    gb_temp.fit(X_train, y_train)
-    acc = np.mean(gb_temp.predict(X_test) == y_test)
-    test_accs.append(acc)
-
-plt.plot(n_rounds, test_accs, "o-", linewidth=2, markersize=8, color="green")
-plt.xlabel("Number of Boosting Rounds")
-plt.ylabel("Test Accuracy")
-plt.title("Accuracy vs Boosting Rounds")
-plt.grid(True)
-
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()
