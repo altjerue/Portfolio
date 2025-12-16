@@ -141,7 +141,7 @@ Accuracy Gap: 0.070
 
 ![](./dectree_accuracy.png)
 
-## Classifying Iris Flowers: Random Forest vs Decision Tree
+## Classifying Iris Flowers: Random Forest
 
 In [ranforest_from_scratch.py](./ranforest_from_scratch.py) I implemented a random forest from scratch using bootstrap resampling, a few number of random features for each tree, and majority voting.
 
@@ -198,3 +198,80 @@ Improvement: 0.067
 ```
 
 ![](./ranforest_accuracy.png)
+
+## Classifying Iris Flowers: Gradient Boosting
+
+In [gradboost_from_scratch.py](./gradboost_from_scratch.py) I implemented gradient boosting. The algorithm calculates the predictions as $\mathrm{logit}$ and probabilities as $\mathrm{SoftMax}$. For each round, the code trains a regression decision tree, and updates the prediction for each target variable.
+
+
+### Output
+
+```
+Loading Iris dataset...
+Training samples: 105
+Test samples: 45
+Classes: ['setosa' 'versicolor' 'virginica']
+------------------------------------------------------------
+
+============================================================
+TRAINING GRADIENT BOOSTING
+============================================================
+
+Training Gradient Boosting with 100 rounds...
+  Round 1/100, Train Acc: 0.838
+  Round 20/100, Train Acc: 0.867
+  Round 40/100, Train Acc: 0.886
+  Round 60/100, Train Acc: 0.895
+  Round 80/100, Train Acc: 0.905
+  Round 100/100, Train Acc: 0.905
+
+------------------------------------------------------------
+RESULTS:
+Train Accuracy: 0.905
+Test Accuracy: 0.689
+Gap: 0.216
+------------------------------------------------------------
+
+============================================================
+COMPARISON: Single Tree vs RF vs Gradient Boosting
+============================================================
+
+1. Training single decision tree (max_depth=20)...
+   Train Accuracy: 0.962
+   Test Accuracy: 0.689
+   Gap: 0.273
+
+2. Training Random Forest
+Trained tree 1/100
+Trained tree 10/100
+Trained tree 20/100
+Trained tree 30/100
+Trained tree 40/100
+Trained tree 50/100
+Trained tree 60/100
+Trained tree 70/100
+Trained tree 80/100
+Trained tree 90/100
+Trained tree 100/100
+   Train Accuracy: 0.943
+   Test Accuracy: 0.756
+   Gap: 0.187
+
+3. Training Gradient Boosting
+
+Training Gradient Boosting with 100 rounds...
+  Round 1/100, Train Acc: 0.838
+  Round 20/100, Train Acc: 0.867
+  Round 40/100, Train Acc: 0.886
+  Round 60/100, Train Acc: 0.895
+  Round 80/100, Train Acc: 0.905
+  Round 100/100, Train Acc: 0.905
+   Train Accuracy: 0.905
+   Test Accuracy: 0.689
+   Gap: 0.216
+
+Typical results on Iris (2 features):
+Single Tree (depth=20):    0.69 test accuracy
+Random Forest (100 trees): 0.76 test accuracy
+Gradient Boosting:         0.90 test accuracy
+```
