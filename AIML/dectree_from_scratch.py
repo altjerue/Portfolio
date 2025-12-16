@@ -58,6 +58,28 @@ def gini_impurity(y):
     return gini
 
 
+def mse_impurity(y):
+    """
+    Calculate the mean squared error (MSE) impurity of a set of target values.
+
+    MSE impurity is treate as Var(y) = E[(y - E[y])**2].
+
+    Args:
+        y : array of numeric target values
+
+    Returns:
+        MSE impurity (float between 0 and 1), computed as the variance of y
+        (population variance). If y is empty, returns 0.0.
+
+    Examples
+        mse_impurity([1, 2, 3]) = 1.0
+        mse_impurity([5.0, 5.0, 5.0]) = 0.0
+    """
+    if len(y) == 0:
+        return 0
+    return np.var(y)
+
+
 def split_data(X, y, feature_idx, threshold):
     """
     Split data based on a feature and threshold.
@@ -89,7 +111,7 @@ def split_data(X, y, feature_idx, threshold):
     return left_X, left_y, right_X, right_y
 
 
-def information_gain(y, left_y, right_y):
+def information_gain(y, left_y, right_y, impurity="gini"):
     """
     Calculate information gain from a split.
 
@@ -99,12 +121,16 @@ def information_gain(y, left_y, right_y):
         y: parent labels
         left_y: left child labels
         right_y: right child labels
+        impurity: 'gini' for classifier and 'mse' for regressor
 
     Returns:
         Information gain (float)
         Higher = better split
     """
-    parent_gini = gini_impurity(y)
+    if impurity == "mse":
+        parent = mse_impurity(y)
+    else:
+        parent = gini_impurity(y)
 
     n_total = len(y)
     n_left = len(left_y)
@@ -113,20 +139,22 @@ def information_gain(y, left_y, right_y):
     if n_left == 0 or n_right == 0:
         return 0  # No split happened
 
-    left_gini = gini_impurity(left_y)  # Gini of the left child
-    right_gini = gini_impurity(right_y)  # Gini of the right child
+    if impurity == "mse":
+        left = mse_impurity(left_y)  # Gini of the left child
+        right = mse_impurity(right_y)  # Gini of the right child
+    else:
+        left = gini_impurity(left_y)  # Gini of the left child
+        right = gini_impurity(right_y)  # Gini of the right child
 
     # Weighted average of child Gini impurities
-    weighted_child_gini = (n_left / n_total) * left_gini + (
-        n_right / n_total
-    ) * right_gini
+    weighted_child = (n_left / n_total) * left + (n_right / n_total) * right
 
-    gain = parent_gini - weighted_child_gini
+    gain = parent - weighted_child
 
     return gain
 
 
-def find_best_split(X, y, max_features=None):
+def find_best_split(X, y, max_features=None, impurity="gini"):
     """
     Find the best feature and threshold to split on.
 
@@ -138,6 +166,7 @@ def find_best_split(X, y, max_features=None):
         y: labels (n_samples,)
         max_features: number of random features to consider
                     (None = all features)
+        impurity: 'gini' for classifier, 'mse' for regressor
     Returns:
         best_feature: index of best feature to split on
         best_threshold: threshold value for split
@@ -178,7 +207,7 @@ def find_best_split(X, y, max_features=None):
                 continue
 
             # Calculate information gain
-            gain = information_gain(y, left_y, right_y)
+            gain = information_gain(y, left_y, right_y, impurity=impurity)
 
             # Update best split if new gain is better
             if gain > best_gain:
@@ -280,7 +309,7 @@ class DecisionTreeClassifier:
             return TreeNode(value=leaf_value)
 
         # Find best split
-        feature, threshold, gain = find_best_split(X, y)
+        feature, threshold, gain = find_best_split(X, y, impurity="gini")
 
         # If no gain OR no valid split found, make this a leaf
         if gain == 0 or feature is None:
@@ -347,6 +376,141 @@ class DecisionTreeClassifier:
             self.print_tree(node.left, depth + 1)
             print(f"{indent}Right:")
             self.print_tree(node.right, depth + 1)
+
+
+# ============================================================
+# %% DECISION TREE REGRESSOR
+# ============================================================
+
+
+class DecisionTreeRegressor:
+    """
+    Decision tree classifier built from scratch.
+    """
+
+    def __init__(self, max_depth=10, min_samples_split=2):
+        """
+        Args:
+            max_depth: maximum tree depth (prevents overfitting)
+            min_samples_split: minimum samples required to split
+        """
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.root = None
+
+    def fit(self, X, y):
+        """
+        Build the decision tree.
+
+        Uses recursive splitting until stopping criteria are met.
+        """
+        self.root = self._build_tree(X, y, depth=0)
+        return self
+
+    def _build_tree(self, X, y, depth):
+        """
+        Recursively build the tree.
+
+        Stopping criteria:
+        1. Reached max_depth
+        2. Not enough samples to split (< min_samples_split)
+        3. Node is pure (all same class)
+        4. No information gain from splitting
+
+        Args:
+            X: feature matrix
+            y: labels
+            depth: current depth in tree
+
+        Returns:
+            TreeNode (internal node or leaf)
+        """
+        n_samples = len(y)
+        n_classes = len(np.unique(y))
+
+        # Stopping criteria
+        if (
+            depth >= self.max_depth
+            or n_samples < self.min_samples_split
+            or n_classes == 1
+        ):
+            # Create and return leaf node
+            leaf_value = np.mean(y)
+            return TreeNode(value=leaf_value)
+
+        # Find best split
+        feature, threshold, gain = find_best_split(X, y, impurity="mse")
+
+        # If no gain OR no valid split found, make this a leaf
+        if gain == 0 or feature is None:
+            leaf_value = np.mean(y)
+            return TreeNode(value=leaf_value)
+
+        # Split data and recursively build children
+        left_X, left_y, right_X, right_y = split_data(X, y, feature, threshold)
+
+        left_child = self._build_tree(left_X, left_y, depth + 1)
+        right_child = self._build_tree(right_X, right_y, depth + 1)
+
+        # Create internal node
+        return TreeNode(
+            feature=feature, threshold=threshold, left=left_child, right=right_child
+        )
+
+    def predict(self, X):
+        """
+        Predict class for samples.
+
+        Args:
+            X: feature matrix (n_samples, n_features)
+
+        Returns:
+            predictions: array of predicted classes
+        """
+        return np.array([self._traverse_tree(x, self.root) for x in X])
+
+    def _traverse_tree(self, x, node):
+        """
+        Traverse tree to find prediction for a single sample.
+
+        Args:
+            x: single sample (n_features,)
+            node: current TreeNode
+
+        Returns:
+            predicted class
+        """
+
+        if node.is_leaf():
+            return node.value
+
+        # Implementing tree traversal
+        if x[node.feature] <= node.threshold:
+            return self._traverse_tree(x, node.left)  # traverse left child
+        else:
+            return self._traverse_tree(x, node.right)  # traverse right child
+
+    def print_tree(self, node=None, depth=0):
+        """
+        Print tree structure (for debugging).
+        """
+        if node is None:
+            node = self.root
+
+        indent = "  " * depth
+        if node.is_leaf():
+            print(f"{indent}Leaf: class={node.value}")
+        else:
+            print(f"{indent}Split: feature_{node.feature} <= {node.threshold:.2f}")
+            print(f"{indent}Left:")
+            self.print_tree(node.left, depth + 1)
+            print(f"{indent}Right:")
+            self.print_tree(node.right, depth + 1)
+
+
+# ============================================================
+# %% VISUALIZATION
+# ============================================================
 
 
 def plot_decision_boundary(model, X, y, title):
