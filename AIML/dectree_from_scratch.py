@@ -18,6 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
+from plot_helper import plot_decision_boundary
 
 np.random.seed(42)
 
@@ -506,42 +507,6 @@ class DecisionTreeRegressor:
             self.print_tree(node.left, depth + 1)
             print(f"{indent}Right:")
             self.print_tree(node.right, depth + 1)
-
-
-# ============================================================
-# %% VISUALIZATION
-# ============================================================
-
-
-def plot_decision_boundary(model, X, y, title):
-    """Plot decision boundary for 2D data.
-
-    Args:
-        model: trained model with a `predict` method
-        X, y: data arrays (2D features expected)
-        title: plot title
-    """
-    h = 0.02
-    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-
-    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
-
-    plt.contourf(xx, yy, Z, alpha=0.3, cmap="viridis")
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", edgecolors="black", s=50)
-
-    try:
-        fname_x = plot_decision_boundary.feature_names[0]
-        fname_y = plot_decision_boundary.feature_names[1]
-    except Exception:
-        fname_x = "feature_0"
-        fname_y = "feature_1"
-
-    plt.xlabel(fname_x)
-    plt.ylabel(fname_y)
-    plt.title(title)
 
 
 if __name__ == "__main__":

@@ -15,8 +15,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from collections import Counter
 from dectree_from_scratch import DecisionTreeClassifier
+from plot_helper import plot_decision_boundary
 
 np.random.seed(42)
 
@@ -166,28 +166,6 @@ class RandomForestClassifier:
 
 
 # ============================================================
-# %% VISUALIZATION
-# ============================================================
-
-
-def plot_decision_boundary(model, X, y, title):
-    """Plot decision boundary for 2D data."""
-    h = 0.02
-    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-
-    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
-
-    plt.contourf(xx, yy, Z, alpha=0.3, cmap="viridis")
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", edgecolors="black", s=50)
-    plt.xlabel(iris.feature_names[0])
-    plt.ylabel(iris.feature_names[1])
-    plt.title(title)
-
-
-# ============================================================
 # %% EXPERIMENT: Compare Single Tree vs Random Forest
 # ============================================================
 
@@ -292,11 +270,16 @@ if __name__ == "__main__":
         X_test,
         y_test,
         f"Single Tree (depth=20)\nTest Acc: {test_acc_single:.3f}",
+        feature_names=iris.feature_names,
     )
 
     plt.subplot(1, 3, 2)
     plot_decision_boundary(
-        rf2, X_test, y_test, f"Random Forest (100 trees)\nTest Acc: {test_acc_rf2:.3f}"
+        rf2,
+        X_test,
+        y_test,
+        f"Random Forest (100 trees)\nTest Acc: {test_acc_rf2:.3f}",
+        feature_names=iris.feature_names,
     )
 
     plt.subplot(1, 3, 3)
