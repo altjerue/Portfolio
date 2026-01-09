@@ -100,7 +100,7 @@ class UserBasedRecommender:
         Returns:
             List of (movie_id, predicted_rating) tuples
         """
-        # Implement recommendation logic
+        # Find similar users
         sim_users = self.find_similar_users(user_id)
 
         movie_sum = {}
@@ -110,7 +110,7 @@ class UserBasedRecommender:
         for _, sim in sim_users:
             if sim <= 0:
                 continue
-            for m, r in self.ratings[u].items():
+            for m, r in self.ratings[user_id].items():
                 if m in self.ratings[user_id].keys():
                     continue
                 movie_weighted[m] = movie_weighted.get(m, 0.0) + sim * r
