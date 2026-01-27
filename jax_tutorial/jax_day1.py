@@ -53,7 +53,7 @@ mask = x > 50
 x = x.at[mask].set(-1)
 
 
-# EXERCISE 1: Rewrite this NumPy code in JAX
+# EXERCISE 1: Rewriting this NumPy code in JAX
 def update_temperatures_numpy(temps):
     """NumPy: Update temperatures that eceed threshold"""
     temps = temps.copy()  # Avoid modifying original
@@ -79,6 +79,7 @@ temps_jax = jnp.array([25, 35, -5, 28, 40, 15])
 
 print("Numpy results: ", update_temperatures_numpy(temps_np))
 print("JAX results:   ", update_temperatures_jax(temps_jax))
+print("=" * 60)
 
 """
 CHECKPOINT 1: Can you explain why immutability matters for parallel computing?
@@ -90,6 +91,7 @@ Answer: Immutable arrays allow to prevent race conditions when parallelizing
 
 # ==============================================================================
 
+# MARK: Random Numbers
 """
 WHY DIFFERENT RANDOMNESS?
 - NumPy uses global state (not reproducible in parallel)
@@ -118,6 +120,61 @@ print(f"First random: {random.uniform(subkey, shape=())}")
 
 key, subkey = random.split(key)
 print(f"Second random: {random.uniform(subkey, shape=())}")
+
+# For multiple random values, split multiple times
+key = random.PRNGKey(42)
+keys = random.split(key, num=5)
+print(f"Shape of keys: {keys.shape}")
+
+# Generate 5 independent random numbers
+random_numbers = jnp.array([random.uniform(k) for k in keys])
+print(f"5 random numbers: {random_numbers}")
+
+# Better: Generate array directly
+key = random.PRNGKey(42)
+random_array = random.uniform(key, shape=(5,))
+print(f"Random array: {random_array}")
+
+# Common distributions for simulations
+key = random.PRNGKey(42)
+key, *subkeys = random.split(key, 5)
+
+normal = random.normal(subkeys[0], shape=(100,))  # Gaussian
+uniform = random.uniform(subkeys[1], shape=(100,))  # Uniform [0,1)
+exponential = random.exponential(subkeys[2], shape=(100,))  # Exponential
+bernoulli = random.bernoulli(subkeys[3], p=0.3, shape=(100,))  # 0/1
+
+
+# EXERCISE 2: Monte Carlo Pi Estimation (NumPy style)
+def monte_carlo_pi_numpy(n_samples):
+    """Estimate pi using Monte Carlo - NumPy version"""
+    x = np.random.uniform(0, 1, n_samples)
+    y = np.random.uniform(0, 1, n_samples)
+    inside = (x**2 + y**2) <= 1
+    return 4 * np.sum(inside) / n_samples
+
+
+# EXERCISE 2: JAX Version
+def monte_carlo_pi_jax(key, n_samples):
+    """Estimate pi using Monte Carlo - JAX version"""
+    # TODO: Implement using JAX random
+    # Need to handle random key properly
+    x = random.uniform(key, shape=(n_samples,))
+    y = random.uniform(key, shape=(n_samples,))
+    inside = (x**2 + y**2) <= 1
+    return 4 * jnp.sum(inside) / n_samples
+
+
+# Test
+pi_estimate = monte_carlo_pi_numpy(1_000_000)
+print(f"NumPy pi estimate: {pi_estimate:.6f}")
+print(f"Error: {abs(pi_estimate - np.pi):.6f}")
+
+key = random.PRNGKey(42)
+pi_estimate = monte_carlo_pi_jax(key, 1_000_000)
+print(f"JAX pi estimate: {pi_estimate:.6f}")
+print(f"Error: {abs(pi_estimate - np.pi):.6f}")
+print("=" * 60)
 
 # ==============================================================================
 
@@ -176,3 +233,91 @@ print(f"Fast version (first call): {first_call_time:.4f} seconds")
 print(f"Fast version (subsequent): {fast_time:.4f} seconds")
 print(f"Speedup: {slow_time / fast_time:.1f}x")
 print(f"Results match: {jnp.allclose(result_slow, result_fast)}")
+print("=" * 60)
+
+# ==============================================================================
+
+# MARK: JIT Rules
+
+"""
+JIT RULES
+1. Function must be "pure" (same input -> same output)
+2. No side effects (no printing, file I/O during computation)
+3. Control flow based on traced values can be tricky
+4. Array shapes should be static when possible
+"""
+
+
+# GOOD: Pure function
+@jit
+def good_function(x, y):
+    return x + y
+
+
+# BAD: has side effects (print)
+@jit
+def bad_function_print(x):
+    print(f"Value: {x}")  # This won't work as expected!
+    return x + 1
+
+
+# BAD: Control flow based on value
+@jit
+def bad_function_control(x):
+    if x > 0:  # This is tricky with JIT!
+        return x
+    else:
+        return -x
+
+
+# GOOD: Use jnp.where for conditional logic
+@jit
+def good_function_control(x):
+    return jnp.where(x > 0, x, -x)
+
+
+# BAD: Dynamic shapes
+@jit
+def bad_function_dynamic(x, threshold):
+    return x[x > threshold]  # Output size depends on values!
+
+
+# GOOD: Static shapes
+@jit
+def good_function_static(x, threshold):
+    mask = x > threshold
+    # Return both mask and values, or use padding
+    return jnp.where(mask, x, 0)
+
+
+# EXERCISE 3: Fix this function to work with JIT
+def compute_statistics_bad(data):
+    """Compute statistics on data."""
+    print(f"Processing {len(data)} samples")  # Issue 1: print
+
+    # Issue 2: dynamic sclicing
+    positive = data[data > 0]
+    negative = data[data <= 0]
+
+    # Issue 3: if statement on traced value
+    if len(positive) > len(negative):
+        return jnp.mean(positive)
+    else:
+        return jnp.mean(negative)
+
+
+# FIXED VERSION:
+@jit
+def compute_statistics_fixed(data):
+    """JIT-compatible version."""
+    mask = data > 0
+    positive = jnp.where(mask, data, 0)
+    negative = jnp.where(~mask, data, 0)
+
+    return jnp.where(mask, jnp.mean(positive), jnp.mean(negative))
+
+
+# Test
+data = jnp.array([1, -2, 3, -4, 5, 6, -1])
+result = compute_statistics_fixed(data)
+print(f"Result: {result}")
