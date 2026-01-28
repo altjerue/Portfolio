@@ -159,8 +159,13 @@ def monte_carlo_pi_jax(key, n_samples):
     """Estimate pi using Monte Carlo - JAX version"""
     # TODO: Implement using JAX random
     # Need to handle random key properly
-    x = random.uniform(key, shape=(n_samples,))
-    y = random.uniform(key, shape=(n_samples,))
+    
+    # Creating a subkey per coordinate to get independent random numbers
+    key, subkey1, subkey2 = random.split(key, 3)
+    
+    x = random.uniform(subkey1, shape=(n_samples,))
+    y = random.uniform(subkey2, shape=(n_samples,))
+
     inside = (x**2 + y**2) <= 1
     return 4 * jnp.sum(inside) / n_samples
 
@@ -310,14 +315,40 @@ def compute_statistics_bad(data):
 @jit
 def compute_statistics_fixed(data):
     """JIT-compatible version."""
-    mask = data > 0
-    positive = jnp.where(mask, data, 0)
-    negative = jnp.where(~mask, data, 0)
+    # Create masks instead of slicing
+    positive_mask = data > 0
+    negative_mask = data <= 0
+    
+    # Count elements in each group
+    n_positive = jnp.sum(positive_mask)
+    n_negative = jnp.sum(negative_mask)    
 
-    return jnp.where(mask, jnp.mean(positive), jnp.mean(negative))
+    # Calculate mean of positive values
+    # Using where to select values, avoiding division by zero
+    sum_positive = jnp.sum(jnp.where(positive_mask, data, 0.0))
+    mean_positive = jnp.where(n_positive > 0, sum_positive / n_positive, 0.0)
+
+    # Calculate mean of negative values
+    sum_negative = jnp.sum(jnp.where(negative_mask, data, 0.0))
+    mean_negative = jnp.where(n_negative > 0, sum_negative / n_negative, 0.0)
+
+    # Return mean of negative values
+    return jnp.where(n_positive > n_negative, mean_positive, mean_negative)
 
 
 # Test
 data = jnp.array([1, -2, 3, -4, 5, 6, -1])
 result = compute_statistics_fixed(data)
 print(f"Result: {result}")
+print("=" * 60)
+
+# NOTE: The use of jnp.where
+# jnp.where with a single argument is NOT JIT-friendly. Returns indices where
+# condition is true (like np.nonzero), e.g.,
+# indices = jnp.where(data > 0)  # Dynamic size, breaks JIT!
+
+# ==============================================================================
+
+# MARK: JIT + vmap
+
+
