@@ -1,39 +1,79 @@
-# This is my Portfolio
+# Jesús M. Rueda-Becerril | Data Science Portfolio
 
-Welcome my portfolio! Also feel welcome to visit my [personal webpage](https://altjerue.github.io)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-jeruebe-blue)](https://www.linkedin.com/in/jeruebe)
+[![Website](https://img.shields.io/badge/Website-altjerue.github.io-green)](https://altjerue.github.io)
+[![DataCamp](https://img.shields.io/badge/DataCamp-Portfolio-orange)](https://www.datacamp.com/portfolio/jmruebe)
 
-## AI & ML
+---
 
-I will be posting in [AIML](./AIML/) projects that are helping me solidify the concepts behind AI and Machine Learning.
+## About This Portfolio
 
-- [Neural Network from scratch](./AIML/neuralnet_from_scratch.py): solved the XOR problem with a two-layer neural network, built from scratch.
+I'm a data scientist with a PhD in Physics and a decade of experience building end-to-end computational systems, from HPC astrophysics simulations to production ML pipelines. This portfolio showcases projects where I implement ML algorithms from first principles, apply data science to real-world problems, and demonstrate the full cycle from problem framing to working code.
 
-- [Decision Tree from scratch](./AIML/dectree_from_scratch.py): implemented a decision tree to classify Iris flowers.
+**Core competencies:** Python · Machine Learning · HPC · Geospatial Analysis · Statistical Modeling · Scientific Computing
 
-- [Random Forest from scratch](./AIML/ranforest_from_scratch.py): implemented a random forest algorithm from scratch to classify Iris flowers, and compared accuracy with the results from a single Decision Tree.
+---
 
-- [Gradient Boosting from scratch](./AIML/gradboost_from_scratch.py): implemented a gradient boosting algorithm from scratch to classify Iris flowers, and compared the accuracy with the results from a single Decision Tree and Random Forest.
+## Projects
 
-### Other projects
+### Machine Learning from Scratch
 
-In the [DataCamp](./DataCamp/) directory, you will find some projects that I have worked on while sharpening my Data Science skills in [DataCamp learning platform](https://datacamp.com)
+> **Why build from scratch?** Understanding what libraries like scikit-learn and XGBoost do under the hood is what separates engineers who use ML tools from engineers who can debug, adapt, and extend them. These implementations prove mathematical depth, not just API familiarity.
 
-You can also find my [DataCamp portfolio here](https://www.datacamp.com/portfolio/jmruebe)
+| Project | Algorithm | Key Concepts | Dataset |
+|---------|-----------|--------------|---------|
+| [Neural Network](./AIML/neuralnet_from_scratch.py) | 2-Layer NN | Backpropagation, tanh activation, gradient descent | XOR problem |
+| [Decision Tree](./AIML/dectree_from_scratch.py) | CART | Gini impurity, information gain, recursive splitting | Iris |
+| [Random Forest](./AIML/ranforest_from_scratch.py) | Ensemble | Bootstrap sampling, feature randomness, majority voting | Iris |
+| [Gradient Boosting](./AIML/gradboost_from_scratch.py) | Boosting | Residual fitting, softmax, shrinkage, additive models | Iris |
 
-#### [Sleep Disorders predictor](./DataCamp/sleep/sleep_data.ipynb)
+See the [AIML README](./AIML/README.md) for full implementation details, benchmark results, and visualizations.
 
-In this project I analyse a dataset to investigate what factors may contribute to sleep disorders, and I build a Logistic Regressor to predict if a client has sleep disorders.
+---
 
-#### [What's in an Avocado Toast](./DataCamp/avocado_toast/avocado_toast_analysis.ipynb)
+### Data Science Projects (DataCamp)
 
-In this project I perform a supply chain analysis of the main ingridients of the famous dish *Avocado toast*: avocado, olive oil and sourdough. I perform a deep data cleaning and exploratory data analysis (EDA) to find where these ingrediantes most commonly originate from.
+Applied data science projects covering the full analytical workflow: data cleaning, EDA, feature engineering, modeling, and communication.
 
-#### [Nobel Prizes](./DataCamp/nobel_prizes/nobel_prizes.ipynb)
+| Project | Techniques | Description |
+|---------|-----------|-------------|
+| [Sleep Disorders Predictor](./DataCamp/sleep/sleep_data.ipynb) | Logistic Regression, EDA | Identifies factors contributing to sleep disorders and builds a binary classifier |
+| [Avocado Toast Supply Chain](./DataCamp/avocado_toast/avocado_toast_analysis.ipynb) | Data cleaning, EDA | Traces global supply chain origins for avocado, olive oil, and sourdough |
+| [Nobel Prize Analysis](./DataCamp/nobel_prizes/nobel_prizes.ipynb) | EDA, Linear Regression | Explores trends in Nobel Prize data across gender, age, and category over decades |
 
-In this project I run an exploratory data analysis on the Nobel Prize database through the decades to find, e.g., trends of gender, age, for differnt categories, using linear regression.
+---
 
-## Advent of Code and Project Euler
+### Competitive Programming
 
-As a good practice to keep coding skills sharp, I like to work on the problems posted in both [AOC](https://adventofcode.com) and [PE](https://projecteuler.net). My solutions can be found:
+Consistent coding practice through algorithm challenges. Solutions to:
 
-- [Advent of Code solutions](https://github.com/altjerue/advent-code)
+- [Advent of Code](https://github.com/altjerue/advent-code)
+- [Project Euler](https://projecteuler.net) (in progress)
+
+---
+
+## Open Source Scientific Software
+
+In addition to this portfolio, I maintain open-source scientific computing tools developed during my research career:
+
+| Project | Language | Description | Publications |
+|---------|----------|-------------|--------------|
+| [Paramo](https://github.com/altjerue/paramo) | Fortran 95 + Python | HPC radiative transfer simulation code with OpenMP optimization (60x speedup) | 5 papers |
+| [Tleco](https://github.com/altjerue/tleco) | Rust + Python | Toolkit for modeling radiative signatures from relativistic outflows | ApJ 2024 |
+
+---
+
+## Technical Stack
+
+```
+Languages:    Python, C/C++, Fortran, R, SQL, Java, Rust, Shell
+ML/DS:        NumPy, Pandas, Scikit-learn, PyTorch, Matplotlib, Seaborn
+Geospatial:   QGIS, Sentinel-1/2 imagery, Rasterio
+HPC:          OpenMP, MPI, SLURM, PBS, Frontera (TACC)
+DevOps:       Git, Docker, Jenkins, OpenShift, Kafka
+Cloud:        Azure, Databricks
+```
+
+---
+
+*This portfolio is actively maintained. New projects added regularly.*
