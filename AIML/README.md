@@ -1,279 +1,219 @@
-# AI and ML
+# Machine Learning from First Principles
 
-## Solving the XOR problem
+I implemented these algorithms from scratch to understand what XGBoost, scikit-learn, and PyTorch are actually doing under the hood. If you can build it, you can debug it, extend it, and explain it to anyone.
 
-In [neuralnet_from_scratch.py](./neuralnet_from_scratch.py) I implemented a Neural Network from scratch to solve the XOR problem. The neural network consists in two layers and uses the $\tanh$ activation function.
+This directory contains clean Python implementations of core ML algorithms built without ML libraries, using only NumPy. Each implementation covers the full mathematical derivation, working code, empirical benchmarks, and visualizations.
 
-### Output
+---
 
+## Why This Matters
+
+Most data scientists can call `sklearn.ensemble.GradientBoostingClassifier`. Far fewer can explain why residual fitting converges, what the softmax gradient looks like, or why shallow trees are used as weak learners. These implementations demonstrate mathematical depth that goes beyond API familiarity.
+
+---
+
+## Implementations
+
+### 1. Neural Network
+
+**File:** [`neuralnet_from_scratch.py`](./neuralnet_from_scratch.py)
+
+**Problem solved:** The XOR problem, which is not linearly separable and cannot be solved by a single-layer perceptron.
+
+**Architecture:**
 ```
-XOR Problem:
-Inputs:
- [[0 0]
- [0 1]
- [1 0]
- [1 1]]
-Targets:
- [[0]
- [1]
- [1]
- [0]]
+Input (2) -> Hidden Layer (4, tanh) -> Output (1)
+```
 
-This is NOT linearly separable - you can't draw a line to separate them!
-------------------------------------------------------------
+**Key concepts implemented:**
+- Forward propagation with tanh activation
+- Mean Squared Error loss
+- Backpropagation via chain rule
+- Gradient descent weight updates
 
-Initialized weights:
-W1 shape: (4, 2)
-b1 shape: (4, 1)
-W2 shape: (1, 4)
-b2 shape: (1, 1)
-------------------------------------------------------------
+**Mathematical core:**
 
-Starting training...
-Epoch 0, Loss: 0.693187
-Epoch 1000, Loss: 0.000000
-Epoch 2000, Loss: 0.000000
-Epoch 3000, Loss: 0.000000
-Epoch 4000, Loss: 0.000000
-Epoch 5000, Loss: 0.000000
-Epoch 6000, Loss: 0.000000
-Epoch 7000, Loss: 0.000000
-Epoch 8000, Loss: 0.000000
-Epoch 9000, Loss: 0.000000
+The forward pass computes:
+```
+z1 = W1 @ x + b1
+h1 = tanh(z1)
+z2 = W2 @ h1 + b2
+```
 
-Training complete!
-------------------------------------------------------------
+Backpropagation uses the chain rule to compute gradients for each parameter. The derivative of tanh is particularly clean: `tanh'(z) = 1 - tanh(z)^2`, which is why we cache `h1` (the output of tanh, not the input) during the forward pass.
 
-Testing on XOR inputs:
+**Result:**
+```
 Input: [0 0], True: 0, Predicted: 0.0000
 Input: [0 1], True: 1, Predicted: 1.0000
 Input: [1 0], True: 1, Predicted: 1.0000
 Input: [1 1], True: 0, Predicted: 0.0000
 ```
+Loss converges to ~0 by epoch 1000.
 
-![](./loss_and_decision_boundary.png)
+---
 
-## Classifying Iris Flowers: Decision Tree
+### 2. Decision Tree (Classifier + Regressor)
 
-In [dectree_from_scratch.py](./dectree_from_scratch.py) I implemented Decision Tree algorithm from scratch to classify species of Iris flowers, using the (classic) Iris dataset. I use *Gini impurity* to estimate the nodes purity (information gain).
+**File:** [`dectree_from_scratch.py`](./dectree_from_scratch.py)
 
-### Output
+**Problem solved:** Multi-class classification on Iris dataset; regression target for use as weak learners in gradient boosting.
+
+**Key concepts implemented:**
+- Gini impurity for classification
+- MSE impurity for regression
+- Information gain calculation
+- Recursive tree building with stopping criteria
+- Tree traversal for prediction
+
+**Mathematical core:**
+
+Gini impurity measures node purity:
 ```
-Loading Iris dataset...
-Training samples: 105
-Test samples: 45
-Features: ['sepal length (cm)', 'sepal width (cm)']
-Classes: ['setosa' 'versicolor' 'virginica']
-------------------------------------------------------------
+Gini = 1 - sum(p_i^2)
+```
+where `p_i` is the proportion of class i. A pure node (all same class) has Gini = 0.
 
-Training decision tree...
+Information gain drives split selection:
+```
+Gain = Gini(parent) - [n_left/n * Gini(left) + n_right/n * Gini(right)]
+```
 
-Tree structure:
-Split: feature_0 <= 5.40
-Left:
-  Split: feature_1 <= 2.70
-  Left:
-    Split: feature_0 <= 4.50
-    Left:
-      Leaf: class=0
-    Right:
-      Split: feature_0 <= 4.90
-      Left:
-        Split: feature_1 <= 2.40
-        Left:
-          Leaf: class=1
-        Right:
-          Leaf: class=2
-      Right:
-        Leaf: class=1
-  Right:
-    Split: feature_0 <= 5.30
-    Left:
-      Leaf: class=0
-    Right:
-      Split: feature_1 <= 3.00
-      Left:
-        Leaf: class=1
-      Right:
-        Leaf: class=0
-Right:
-  Split: feature_0 <= 6.10
-  Left:
-    Split: feature_1 <= 3.20
-    Left:
-      Split: feature_0 <= 5.70
-      Left:
-        Split: feature_0 <= 5.50
-        Left:
-          Leaf: class=1
-        Right:
-          Leaf: class=1
-      Right:
-        Split: feature_1 <= 3.00
-        Left:
-          Leaf: class=1
-        Right:
-          Leaf: class=1
-    Right:
-      Leaf: class=0
-  Right:
-    Split: feature_1 <= 2.50
-    Left:
-      Leaf: class=1
-    Right:
-      Split: feature_0 <= 7.00
-      Left:
-        Split: feature_1 <= 3.20
-        Left:
-          Leaf: class=2
-        Right:
-          Leaf: class=2
-      Right:
-        Leaf: class=2
-------------------------------------------------------------
+The `find_best_split` function tries all features and all unique threshold values, selecting the split maximizing information gain. Feature subsampling (`max_features='sqrt'`) is supported for use in Random Forest.
 
+**Result (max_depth=5, 2 features):**
+```
 Train Accuracy: 0.848
-Test Accuracy: 0.778
-Accuracy Gap: 0.070
-✅ Good generalization!
-------------------------------------------------------------
+Test Accuracy:  0.778
+Gap:            0.070  (good generalization)
 ```
 
-![](./dectree_accuracy.png)
+**Key design decision:** Both a `DecisionTreeClassifier` (leaf = majority class) and `DecisionTreeRegressor` (leaf = mean value) are implemented, since gradient boosting requires regression trees even for classification tasks.
 
-## Classifying Iris Flowers: Random Forest
+---
 
-In [ranforest_from_scratch.py](./ranforest_from_scratch.py) I implemented a random forest from scratch using bootstrap resampling, a few number of random features for each tree, and majority voting.
+### 3. Random Forest
 
-### Output
+**File:** [`ranforest_from_scratch.py`](./ranforest_from_scratch.py)
 
+**Problem solved:** Reducing overfitting of a single deep decision tree through ensemble averaging.
+
+**Key concepts implemented:**
+- Bootstrap sampling (with replacement)
+- Feature randomness at each split (sqrt subsampling)
+- Majority voting for aggregation
+- Comparison with single tree baseline
+
+**Mathematical intuition:**
+
+A single deep tree memorizes training data (high variance). Random Forest reduces variance by averaging many uncorrelated trees. The two sources of randomness, bootstrap sampling and feature subsampling, ensure trees are decorrelated even when trained on similar data.
+
+Variance reduction follows:
 ```
-Loading Iris dataset...
-Training samples: 105
-Test samples: 45
-------------------------------------------------------------
-
-============================================================
-EXPERIMENT: Single Tree vs Random Forest
-============================================================
-
-1. Training single decision tree (max_depth=20)...
-   Train Accuracy: 0.962
-   Test Accuracy: 0.689
-   Gap: 0.273
-
-2. Training Random Forest (30 trees, max_depth=10)...
-Trained tree 1/30
-Trained tree 10/30
-Trained tree 20/30
-Trained tree 30/30
-   Train Accuracy: 0.914
-   Test Accuracy: 0.711
-   Gap: 0.203
-
-3. Training Random Forest (100 trees, max_depth=20)...
-Trained tree 1/100
-Trained tree 10/100
-Trained tree 20/100
-Trained tree 30/100
-Trained tree 40/100
-Trained tree 50/100
-Trained tree 60/100
-Trained tree 70/100
-Trained tree 80/100
-Trained tree 90/100
-Trained tree 100/100
-   Train Accuracy: 0.943
-   Test Accuracy: 0.756
-   Gap: 0.187
-
-------------------------------------------------------------
-COMPARISON:
-Single Tree Test Acc: 0.689
-Random Forest 30 Test Acc: 0.711
-Improvement: 0.022
-Random Forest 100 Test Acc: 0.756
-Improvement: 0.067
-------------------------------------------------------------
+Var(mean of n trees) = rho * sigma^2 + (1-rho)/n * sigma^2
 ```
+where `rho` is the correlation between trees. Lower correlation = more variance reduction.
 
-![](./ranforest_accuracy.png)
-
-## Classifying Iris Flowers: Gradient Boosting
-
-In [gradboost_from_scratch.py](./gradboost_from_scratch.py) I implemented gradient boosting. The algorithm calculates the predictions as $\mathrm{logit}$ and probabilities as $\mathrm{SoftMax}$. For each round, the code trains a regression decision tree, and updates the prediction for each target variable.
-
-
-### Output
-
+**Benchmark results (100 trees, Iris, 2 features):**
 ```
-Loading Iris dataset...
-Training samples: 105
-Test samples: 45
-Classes: ['setosa' 'versicolor' 'virginica']
-------------------------------------------------------------
+Single Tree (depth=20):      Test Acc: 0.689  Gap: 0.273
+Random Forest (30 trees):    Test Acc: 0.711  Gap: 0.203
+Random Forest (100 trees):   Test Acc: 0.756  Gap: 0.187
+```
+The ensemble reduces both overfitting (gap) and test error simultaneously.
 
-============================================================
-TRAINING GRADIENT BOOSTING
-============================================================
+---
 
-Training Gradient Boosting with 100 rounds...
-  Round 1/100, Train Acc: 1.000
-  Round 20/100, Train Acc: 1.000
-  Round 40/100, Train Acc: 1.000
-  Round 60/100, Train Acc: 1.000
-  Round 80/100, Train Acc: 1.000
-  Round 100/100, Train Acc: 1.000
+### 4. Gradient Boosting
 
-------------------------------------------------------------
-RESULTS:
-Train Accuracy: 1.000
-Test Accuracy: 0.956
-Gap: 0.044
-------------------------------------------------------------
+**File:** [`gradboost_from_scratch.py`](./gradboost_from_scratch.py)
 
-============================================================
-COMPARISON: Single Tree vs RF vs Gradient Boosting
-============================================================
+**Problem solved:** Multi-class classification using sequential ensemble of regression trees.
 
-1. Training single decision tree (max_depth=20)...
-   Train Accuracy: 1.000
-   Test Accuracy: 0.956
-   Gap: 0.044
+**Key concepts implemented:**
+- One-vs-all multi-class strategy
+- Softmax for probability conversion
+- Residual fitting (pseudo-gradients)
+- Shrinkage (learning rate)
+- Additive model updates
+- Comparison with single tree and random forest
 
-2. Training Random Forest
-Trained tree 1/100
-Trained tree 10/100
-Trained tree 20/100
-Trained tree 30/100
-Trained tree 40/100
-Trained tree 50/100
-Trained tree 60/100
-Trained tree 70/100
-Trained tree 80/100
-Trained tree 90/100
-Trained tree 100/100
-   Train Accuracy: 1.000
-   Test Accuracy: 1.000
-   Gap: 0.000
+**Mathematical core:**
 
-3. Training Gradient Boosting
+Gradient boosting performs functional gradient descent. At each iteration:
 
-Training Gradient Boosting with 100 rounds...
-  Round 1/100, Train Acc: 0.971
-  Round 20/100, Train Acc: 0.981
-  Round 40/100, Train Acc: 0.990
-  Round 60/100, Train Acc: 1.000
-  Round 80/100, Train Acc: 1.000
-  Round 100/100, Train Acc: 1.000
-   Train Accuracy: 1.000
-   Test Accuracy: 1.000
-   Gap: 0.000
-
-Typical results on Iris (2 features):
-Single Tree (depth=20):    0.96 test accuracy
-Random Forest (100 trees): 1.00 test accuracy
-Gradient Boosting:         1.00 test accuracy
+1. Convert current logits to probabilities via softmax:
+```
+p_i = exp(logit_i) / sum(exp(logit_j))
 ```
 
-![](./gradboost_acc.png)
+2. Compute residuals (negative gradient of cross-entropy loss):
+```
+residuals = y_one_hot - probabilities
+```
+
+3. For each class, fit a regression tree to its residuals
+
+4. Update logits with shrinkage:
+```
+logits[:, k] += learning_rate * tree_k.predict(X)
+```
+
+This is exactly what XGBoost and LightGBM do, with additional optimizations (second-order gradients, histogram binning, etc.).
+
+**Why shallow trees?** Deep trees overfit residuals. Shallow trees (max_depth=3-5) are "weak learners" that capture the most important structure without memorizing noise. Many weak learners sum to a strong learner.
+
+**Benchmark results (100 rounds, Iris, all 4 features):**
+```
+Single Tree (depth=20):      Test Acc: 0.956  Gap: 0.044
+Random Forest (100 trees):   Test Acc: 1.000  Gap: 0.000
+Gradient Boosting (lr=0.1):  Test Acc: 1.000  Gap: 0.000
+```
+
+Training progression shows gradient boosting converging systematically:
+```
+Round  1/100,  Train Acc: 0.971
+Round 20/100,  Train Acc: 0.981
+Round 40/100,  Train Acc: 0.990
+Round 60/100,  Train Acc: 1.000
+```
+
+---
+
+## Key Design Patterns
+
+**Shared infrastructure:** All tree-based models share the same `TreeNode`, `find_best_split`, `split_data`, and `information_gain` functions from `dectree_from_scratch.py`. This mirrors how production libraries like scikit-learn structure their code.
+
+**Composability:** `GradientBoostingClassifier` imports `DecisionTreeRegressor` directly, demonstrating that gradient boosting is not a monolithic algorithm but an ensemble framework that accepts any weak learner.
+
+**Both classifier and regressor for Decision Tree:** This is a deliberate design choice. Gradient boosting for classification uses regression trees internally (fitting residuals, which are continuous), not classification trees.
+
+---
+
+## Running the Code
+
+```bash
+# Decision Tree
+python dectree_from_scratch.py
+
+# Random Forest
+python ranforest_from_scratch.py
+
+# Gradient Boosting
+python gradboost_from_scratch.py
+
+# Neural Network
+python neuralnet_from_scratch.py
+```
+
+**Dependencies:** `numpy`, `matplotlib`, `scikit-learn` (for datasets and train/test split only)
+
+---
+
+## What's Next
+
+- [ ] XGBoost extensions: second-order gradients, regularization terms
+- [ ] K-Means and DBSCAN clustering from scratch
+- [ ] Logistic Regression with L1/L2 regularization
+- [ ] Cross-validation and hyperparameter tuning framework
+- [ ] PyTorch CNN for image classification
