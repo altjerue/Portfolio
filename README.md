@@ -26,6 +26,7 @@ I'm a data scientist with a PhD in Physics and a decade of experience building e
 | [Decision Tree](./AIML/dectree_from_scratch.py) | CART | Gini impurity, information gain, recursive splitting | Iris |
 | [Random Forest](./AIML/ranforest_from_scratch.py) | Ensemble | Bootstrap sampling, feature randomness, majority voting | Iris |
 | [Gradient Boosting](./AIML/gradboost_from_scratch.py) | Boosting | Residual fitting, softmax, shrinkage, additive models | Iris |
+| [Movie Recommender](./AIML/movie_rec/movie_recommender.ipynb) | Collaborative Filtering | User-Based CF, Item-Based CF, Matrix Factorization (SGD) | Synthetic (1K users · 500 movies) |
 
 See the [AIML README](./AIML/README.md) for full implementation details, benchmark results, and visualizations.
 
@@ -40,6 +41,22 @@ Applied data science projects covering the full analytical workflow: data cleani
 | [Sleep Disorders Predictor](./DataCamp/sleep/sleep_data.ipynb) | Logistic Regression, EDA | Identifies factors contributing to sleep disorders and builds a binary classifier |
 | [Avocado Toast Supply Chain](./DataCamp/avocado_toast/avocado_toast_analysis.ipynb) | Data cleaning, EDA | Traces global supply chain origins for avocado, olive oil, and sourdough |
 | [Nobel Prize Analysis](./DataCamp/nobel_prizes/nobel_prizes.ipynb) | EDA, Linear Regression | Explores trends in Nobel Prize data across gender, age, and category over decades |
+| [World's Oldest Businesses](./DataCamp/oldest_businesses/oldest_businesses.ipynb) | Multi-table joins, GroupBy, EDA | SQL-style pandas analysis across 163 countries to find the world's most enduring businesses by continent and industry |
+
+---
+
+### Kaggle Projects
+
+End-to-end ML pipelines on real Kaggle datasets: EDA, preprocessing, multi-model comparison, and business interpretation.
+
+| Project | Problem | Methods | Best Result |
+|---------|---------|---------|-------------|
+| [Titanic Survival](./Kaggle/Getting_Started_with_Titanic.ipynb) | Binary Classification | EDA, Random Forest | Survival prediction from passenger demographics |
+| [Telco Customer Churn](./Kaggle/Telco_churn.ipynb) | Binary Classification | 7 models · sklearn Pipeline · Feature Importance | Logistic Regression: F1=0.626, ROC-AUC=0.861 |
+
+The Telco Churn project benchmarks Logistic Regression, KNN, Decision Tree, Random Forest, SVM, Gradient Boosting, and XGBoost in a single pipeline with a shared 80/20 split. Feature importance analysis identifies tenure, monthly charges, and fiber optic service as the top churn drivers.
+
+See the [Kaggle README](./Kaggle/README.md) for full analysis details.
 
 ---
 
