@@ -76,7 +76,7 @@ In addition to this portfolio, I maintain open-source scientific computing tools
 | Project | Language | Description | Publications |
 |---------|----------|-------------|--------------|
 | [Paramo](https://github.com/altjerue/paramo) | Fortran 95 + Python | HPC radiative transfer simulation code with OpenMP optimization (60x speedup) | 5 papers |
-| [Tleco](https://github.com/altjerue/tleco) | Rust + Python | Toolkit for modeling radiative signatures from relativistic outflows | ApJ 2024 |
+| [Tleco](https://github.com/zkdavis/Tleco) | Rust + Python | Toolkit for modeling radiative signatures from relativistic outflows | ApJ 2024 |
 
 ---
 
